@@ -9,6 +9,8 @@ djangorestframework = "*"
 "psycopg2" = "*"
 pillow = "*"
 djangorestframework-jwt = "*"
+gunicorn = "*"
+django-heroku = "*"
 
 [dev-packages]
 "autopep8" = "*"
