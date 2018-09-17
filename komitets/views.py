@@ -6,6 +6,7 @@ from .serializers import KomitetSerializer
 from users.serializers import UserPermissionsSerializer
 from .models import Komitet
 from users.models import UserPermissions
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 
 
@@ -16,34 +17,20 @@ class CreateKomitetView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Komitet.objects.users_komitets(self.request.user)
 
-    def post(self, request, *args, **kwargs):
-        serializer = KomitetSerializer(data=request.POST)
-        if serializer.is_valid():
-            komitet = Komitet(
-                title=request.POST.get('title', ''),
-                description=request.POST.get('description', ''),
-                image=request.POST.get('image', ''),
-                background=request.POST.get('background', ''),
-            )
-            komitet.save()
-            komitet.refresh_from_db()
-            UserPermissions.objects.create(
-                user=request.user,
-                komitet=komitet,
-                permission='A'
-            )
-            serializer = KomitetSerializer(data=komitet)
-            serializer.is_valid()
-            return Response(serializer.data)
-
 
 class KomitetDetailView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = KomitetSerializer
     queryset = Komitet.objects.all()
 
+    def get_object(self):
+        komitet = Komitet.objects.get(pk=self.kwargs['pk'])
+        if self.request.user in komitet.get_not_banned():
+            return komitet
+        raise PermissionDenied
 
-class AddUsersToKomitetView(generics.ListCreateAPIView):
+
+class UsersInKomitetView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserPermissionsSerializer
 

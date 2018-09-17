@@ -15,4 +15,7 @@ class Komitet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    objects = KomitetManager()
+    objects = KomitetManager()c
+
+    def get_not_banned(self):
+        return self.members.exclude(userpermissions__permission='B')
