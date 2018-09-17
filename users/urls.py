@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SignUpView, UserListView, ActivateUserView, ResetPasswordView, ResetPasswordRequestView
+from .views import SignUpView, ActivateUserView, ResetPasswordView, ResetPasswordRequestView
 from rest_framework import routers
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
@@ -10,7 +10,6 @@ router = routers.SimpleRouter()
 app_name = 'users'
 urlpatterns = [
     path('auth/signup', SignUpView.as_view(), name='sign-up'),
-    path('users', UserListView.as_view(), name='user-list'),
     path('auth/login', obtain_jwt_token),
     path('auth/verify', verify_jwt_token),
     path('auth/refresh', verify_jwt_token),
