@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 
+from .models import UserPermissions
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -20,3 +22,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email',
                   'password', 'first_name', 'last_name')
+
+
+class UserPermissionsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserPermissions
+        fields = ('user', 'komitet', 'permission')

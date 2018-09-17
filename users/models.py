@@ -24,9 +24,9 @@ class UserPermissions(models.Model):
     permission = models.CharField(max_length=10, choices=PERMISSIONS)
 
 
-def set_permission(self, committee, permission):
+def set_permission(self, komitet, permission):
     user_permission = UserPermissions.objects.get(
-        user=self, committee=committee)
+        user=self, komitet=komitet)
     user_permission.permission = permission
     user_permission.save()
 
