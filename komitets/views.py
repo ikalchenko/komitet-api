@@ -6,7 +6,7 @@ from .serializers import KomitetSerializer
 from users.serializers import UserPermissionsSerializer
 from .models import Komitet
 from users.models import UserPermissions
-from django.core.exceptions import PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 from django.contrib.auth.models import User
 
 
@@ -24,15 +24,10 @@ class KomitetDetailView(generics.RetrieveAPIView):
     queryset = Komitet.objects.all()
 
     def get_object(self):
-        komitet = Komitet.objects.get(pk=self.kwargs['pk'])
+        try:
+            komitet = Komitet.objects.get(pk=self.kwargs['pk'])
+        except Komitet.DoesNotExist:
+            raise NotFound
         if self.request.user in komitet.get_not_banned():
             return komitet
         raise PermissionDenied
-
-
-class UsersInKomitetView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UserPermissionsSerializer
-
-    def get_queryset(self):
-        return Komitet.objects.users_komitets(self.request.user)

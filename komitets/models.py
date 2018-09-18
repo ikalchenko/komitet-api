@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
+from django.db.models import Q
 from users.models import UserPermissions
 from .managers import KomitetManager
 
@@ -15,7 +15,17 @@ class Komitet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    objects = KomitetManager()c
+    objects = KomitetManager()
 
     def get_not_banned(self):
         return self.members.exclude(userpermissions__permission='B')
+
+    def get_admins(self):
+        return self.members.filter(userpermissions__permission='A')
+
+    def get_writers(self):
+        return self.members.filter(Q(userpermissions__permission='A')
+                                   | Q(userpermissions__permission='RW'))
+
+    def get_banned(self):
+        return self.members.filter(userpermissions__permission='B')

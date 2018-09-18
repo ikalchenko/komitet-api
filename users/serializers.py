@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
-
+from komitets.models import Komitet
 from .models import UserPermissions
 
 
@@ -29,3 +29,19 @@ class UserPermissionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPermissions
         fields = ('user', 'komitet', 'permission')
+
+    def create(self, validated_data):
+        # check for existance of this permission
+        user = self.context['request'].user
+        komitet = self.context['komitet']
+        komitet = Komitet.objects.get(
+            pk=komitet
+        )
+        if user in komitet.get_writers():
+            user_permission = UserPermissions(
+                user=validated_data['user'],
+                komitet=komitet,
+                permission=validated_data['permission']
+            )
+            user_permission.save()
+        return user_permission

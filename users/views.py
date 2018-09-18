@@ -5,11 +5,15 @@ from django.utils.http import urlsafe_base64_decode
 from rest_framework import status, views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework import generics
 from .serializers import UserSerializer
 from .tokens import account_activation_token as aat
 from .tokens import password_reset_token as prt
 from .utils import send_confirmation_email
+from .serializers import UserPermissionsSerializer
+from komitets.models import Komitet
+from rest_framework.exceptions import NotFound
+from users.models import UserPermissions
 
 
 class SignUpView(views.APIView):
@@ -75,3 +79,19 @@ class ResetPasswordRequestView(views.APIView):
             send_confirmation_email(
                 self.request, user, reset_password=True)
         return Response({'status': 'success'}, status.HTTP_200_OK)
+
+
+class UsersInKomitetView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_serializer(self, *args, **kwargs):
+        if self.request.method == 'POST':
+            return UserPermissionsSerializer(data=self.request.POST, context={
+                'komitet': self.kwargs['komitet_id'],
+                'request': self.request
+            })
+        elif self.request.method == 'GET':
+            return UserPermissionsSerializer(self.get_queryset(), many=True)
+
+    def get_queryset(self):
+        return UserPermissions.objects.filter(komitet=self.kwargs['komitet_id'])
