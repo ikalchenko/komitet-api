@@ -46,8 +46,8 @@ class ActivateUserView(views.APIView):
         if user and aat.check_token(user, kwargs['token']):
             user.is_active = True
             user.save()
-            return Response({'status': 'success'}, status.HTTP_200_OK)
-        return Response({'status': 'fail'}, status.HTTP_400_BAD_REQUEST)
+            return Response({}, status.HTTP_200_OK)
+        return Response({}, status.HTTP_400_BAD_REQUEST)
 
 
 class ResetPasswordView(views.APIView):
